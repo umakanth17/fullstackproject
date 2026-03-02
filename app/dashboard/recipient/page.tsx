@@ -32,8 +32,8 @@ export default function RecipientDashboard() {
     };
 
     const filteredFood = availableFood.filter(f =>
-        f.title.toLowerCase().includes(search.toLowerCase()) ||
-        (f.donor || '').toLowerCase().includes(search.toLowerCase())
+        (f.title || '').toLowerCase().includes((search || '').toLowerCase()) ||
+        (f.donor || '').toLowerCase().includes((search || '').toLowerCase())
     );
 
     return (

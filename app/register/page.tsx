@@ -211,21 +211,21 @@ export default function Register() {
 
         // Register User
         try {
-            if (!auth) {
-                setError('Firebase Auth is not initialized.');
-                return;
+            const isFirebaseConfigured = process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'your_api_key';
+
+            if (auth && isFirebaseConfigured) {
+                // 1. Create User in Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+                const user = userCredential.user;
+
+                // 2. Send Verification Email
+                await sendEmailVerification(user);
+
+                // 3. Update Profile (DisplayName)
+                await updateProfile(user, {
+                    displayName: formData.fullName
+                });
             }
-            // 1. Create User in Firebase Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-            const user = userCredential.user;
-
-            // 2. Send Verification Email
-            await sendEmailVerification(user);
-
-            // 3. Update Profile (DisplayName)
-            await updateProfile(user, {
-                displayName: formData.fullName
-            });
 
             // 4. Save User Profile to Local Storage (Mock Database)
             const userToRegister = {
@@ -241,7 +241,7 @@ export default function Register() {
                 availability: formData.availability,
                 orgName: formData.orgName,
                 role: 'donor', // Default role
-                emailVerified: false // Initially false until verified
+                emailVerified: isFirebaseConfigured ? false : true // Initially false until verified, or true in dev mode
             };
 
             // We still use registerUser to save to our "Database" (localStorage)
@@ -254,12 +254,13 @@ export default function Register() {
             }
 
             // 5. Sign Out (Force login to verify)
-            if (auth) {
+            if (auth && isFirebaseConfigured) {
                 await signOut(auth);
+                alert('Registration Successful! A verification link has been sent to your email. Please verify before logging in.');
+            } else {
+                alert('Registration Successful!');
             }
 
-            // Success
-            alert('Registration Successful! A verification link has been sent to your email. Please verify before logging in.');
             router.push('/login');
 
         } catch (error: any) {
@@ -295,18 +296,7 @@ export default function Register() {
                                 {error}
                             </div>
                         )}
-
-                        {!firebaseInitialized && (
-                            <div className="md:col-span-2 bg-yellow-500/20 border border-yellow-500/50 text-yellow-100 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
-                                <AlertCircle size={16} className="text-yellow-500" />
-                                <span>
-                                    <strong>Setup Required:</strong> Firebase is not configured.
-                                    OTP and Email Verification will not work.
-                                    Please add your API keys to <code>.env.local</code>.
-                                </span>
-                            </div>
-                        )}
-
+                        {/* Removed firebaseInitialized warning for local/dev use */}
                         {/* Left Column */}
                         <div className="space-y-4">
                             <div className="space-y-1">

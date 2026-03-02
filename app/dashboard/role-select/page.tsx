@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
+import VideoBackground from '@/components/VideoBackground';
 
 export default function RoleSelect() {
     const router = useRouter();
@@ -13,20 +14,25 @@ export default function RoleSelect() {
     ];
     return (
         <Layout>
-            <div className="min-h-screen flex flex-col items-center justify-center py-16">
-                <h1 className="text-3xl font-bold mb-8">Select Your Dashboard</h1>
-                <div className="grid md:grid-cols-2 gap-8 w-full max-w-3xl">
-                    {roles.map(role => (
-                        <button
-                            key={role.key}
-                            onClick={() => router.push(`/dashboard/${role.key}`)}
-                            className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 flex flex-col items-start hover:bg-green-50 transition-colors"
-                        >
-                            <span className="text-xl font-semibold mb-2 text-green-700">{role.label}</span>
-                            <span className="text-gray-600 mb-4">{role.desc}</span>
-                            <span className="mt-auto text-green-600 font-bold">Go to {role.label}</span>
-                        </button>
-                    ))}
+            <div className="min-h-screen flex flex-col items-center justify-center py-16 relative overflow-hidden">
+                <VideoBackground />
+                <div className="relative z-10 w-full flex flex-col items-center">
+                    <h1 className="text-4xl font-bold mb-12 text-white drop-shadow-md">Select Your Dashboard</h1>
+                    <div className="grid md:grid-cols-2 gap-8 w-full max-w-4xl px-6">
+                        {roles.map(role => (
+                            <button
+                                key={role.key}
+                                onClick={() => router.push(`/dashboard/${role.key}`)}
+                                className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl p-8 flex flex-col items-start hover:bg-white/20 transition-all group hover:-translate-y-1"
+                            >
+                                <span className="text-2xl font-bold mb-3 text-green-300 group-hover:text-green-200 transition-colors">{role.label}</span>
+                                <span className="text-gray-200 mb-6 text-left">{role.desc}</span>
+                                <span className="mt-auto text-white font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
+                                    Go to {role.label} <span className="text-xl">→</span>
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
         </Layout>

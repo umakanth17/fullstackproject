@@ -1,34 +1,29 @@
-
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-let app;
-let auth: ReturnType<typeof getAuth> | null = null;
+let app: FirebaseApp | undefined;
+let auth: Auth | null = null;
 let firebaseInitialized = false;
 let firebaseError = "";
 
 try {
-    // Check if critical keys are present
-    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'dummy') {
-        throw new Error("Firebase API Key is missing or invalid. Please check .env.local");
-    }
-
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    auth = getAuth(app);
-    firebaseInitialized = true;
-} catch (error: any) {
-    console.error("Firebase Initialization Error:", error);
-    firebaseError = error.message;
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  firebaseInitialized = true;
+} catch (err: any) {
+  auth = null;
+  firebaseInitialized = false;
+  firebaseError = err.message || "Firebase initialization failed.";
 }
 
 export { auth, firebaseInitialized, firebaseError };
